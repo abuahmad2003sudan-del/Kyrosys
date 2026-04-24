@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@100..900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Inter", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-cosmic: #0A0A0F; /* Elite Black Pearl */
+  --color-gold: #D4AF37; /* Elite Gold */
+  --color-pearl: #F0E6D2; /* Silken Pearl */
+  --color-platinum: #E5E4E2; /* Platinum */
+  --color-obsidian: #050505;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 16px;
+    }
+  }
+  body {
+    @apply font-sans bg-cosmic text-pearl overflow-x-hidden;
+    cursor: default;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+  
+  /* Universal smooth timing for transitions */
+  * {
+    transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+  }
+}
+
+@layer components {
+  /* Lovable-inspired Glass Card */
+  .lovable-glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  /* Platinum Elite Glass */
+  .platinum-glass {
+    @apply bg-pearl/10 backdrop-blur-2xl border border-platinum/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+  }
+
+  .liquid-glass-heavy {
+    background: linear-gradient(135deg, rgba(14, 14, 18, 0.6), rgba(5, 5, 8, 0.9));
+    backdrop-filter: blur(50px) saturate(250%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    box-shadow: 0 16px 64px -8px rgba(0, 0, 0, 0.9), inset 0 0 40px 0 rgba(212, 175, 55, 0.05);
+  }
+
+  .gold-glow {
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.4);
+  }
+
+  .gold-glow-heavy {
+    box-shadow: 0 0 50px rgba(212, 175, 55, 0.35), inset 0 0 30px rgba(212, 175, 55, 0.2);
+  }
+  
+  /* 3D Tilt Wrapper */
+  .card-3d-wrapper {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cosmic);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold);
+  border-radius: 4px;
+}
+
+/* Majestic Mode Overrides */
+body.majestic-mode {
+  background-color: #030303 !important;
+  --color-cosmic: #030303;
+}
+
+body.majestic-mode p,
+body.majestic-mode .text-\[10px\],
+body.majestic-mode .text-xs:not(button),
+body.majestic-mode .opacity-40,
+body.majestic-mode .text-pearl\/40,
+body.majestic-mode .text-pearl\/50 {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+body.majestic-mode h1,
+body.majestic-mode h2,
+body.majestic-mode h3 {
+  transform: scale(1.15);
+  color: #F2C94C !important;
+  text-shadow: 0 0 40px rgba(242, 201, 76, 0.5) !important;
+  letter-spacing: -0.02em;
+}
+
+body[dir="rtl"].majestic-mode h1,
+body[dir="rtl"].majestic-mode h2,
+body[dir="rtl"].majestic-mode h3 {
+  transform-origin: right center !important;
+}
+
+body[dir="ltr"].majestic-mode h1,
+body[dir="ltr"].majestic-mode h2,
+body[dir="ltr"].majestic-mode h3 {
+  transform-origin: left center !important;
+}
+
+body.majestic-mode * {
+  transition-duration: 2s !important;
+}
+
