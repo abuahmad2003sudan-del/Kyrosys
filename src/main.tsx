@@ -6,6 +6,7 @@ import { CosmicHarmonyProvider } from './hooks/useCosmicHarmony';
 import { CurrencyProvider } from './hooks/useCurrency';
 import { MajesticModeProvider } from './contexts/MajesticModeContext';
 import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -13,11 +14,13 @@ createRoot(document.getElementById('root')!).render(
     <AuthProvider>
       <LanguageProvider>
         <CurrencyProvider>
-          <CosmicHarmonyProvider>
-            <MajesticModeProvider>
-              <App />
-            </MajesticModeProvider>
-          </CosmicHarmonyProvider>
+          <CartProvider>
+            <CosmicHarmonyProvider>
+              <MajesticModeProvider>
+                <App />
+              </MajesticModeProvider>
+            </CosmicHarmonyProvider>
+          </CartProvider>
         </CurrencyProvider>
       </LanguageProvider>
     </AuthProvider>

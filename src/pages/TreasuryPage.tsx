@@ -4,6 +4,7 @@ import { Wallet, ArrowDownLeft, ArrowUpRight, Shield, Zap } from 'lucide-react';
 import { hapticFeedback } from '../lib/utils';
 import { useCurrency } from '../hooks/useCurrency';
 import GoldDust from '../components/GoldDust';
+import { PAYMENT_LINKS } from '../config/paymentLinks';
 
 export const TreasuryPage = () => {
   const { formatCurrency } = useCurrency();
@@ -11,28 +12,11 @@ export const TreasuryPage = () => {
   const [loading, setLoading] = useState(false);
   const [dustTrigger, setDustTrigger] = useState(0);
 
-  const handleDeposit = async () => {
+  const handleDeposit = () => {
     hapticFeedback('heavy');
-    setLoading(true);
     setDustTrigger(prev => prev + 1);
-
-    try {
-      const resp = await fetch('/api/payments/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId: `wallet_deposit`, amount: amount })
-      });
-      const data = await resp.json();
-      if (data.invoice_url && data.invoice_url !== "#") {
-        window.open(data.invoice_url, '_blank');
-      } else if (data.id) {
-        document.dispatchEvent(new CustomEvent('changeSection', { detail: 'orderConf' }));
-      }
-    } catch(e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    
+    window.open(PAYMENT_LINKS.wallet_deposit || PAYMENT_LINKS.template_basic, '_blank');
   };
 
   return (

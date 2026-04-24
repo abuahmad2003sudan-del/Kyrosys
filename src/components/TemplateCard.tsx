@@ -1,9 +1,11 @@
-import { Star, Eye, ExternalLink } from 'lucide-react';
+import { Star, Eye, ExternalLink, ShoppingBag } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { Template } from '../types';
 import { useCurrency } from '../hooks/useCurrency';
 import { hapticFeedback } from '../lib/utils';
 import { soundscapes } from '../lib/soundscapes';
+import { useCart } from '../context/CartContext';
+import { PAYMENT_LINKS } from '../config/paymentLinks';
 import React from 'react';
 
 interface TemplateCardProps {
@@ -14,6 +16,7 @@ interface TemplateCardProps {
 
 const TemplateCard = React.memo(({ template, onPreview }: TemplateCardProps) => {
   const { formatCurrency } = useCurrency();
+  const { addToCart } = useCart();
   
   // 3D Tilt Logic
   const x = useMotionValue(0);
@@ -97,28 +100,26 @@ const TemplateCard = React.memo(({ template, onPreview }: TemplateCardProps) => 
             </button>
             <div className="flex gap-2">
               <button 
-                onClick={async (e) => {
+                onClick={(e) => {
+                  e.stopPropagation();
+                  hapticFeedback('medium');
+                  addToCart(template);
+                }}
+                className="bg-white/10 backdrop-blur-md text-pearl px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-tighter border border-white/20 hover:bg-gold/20 hover:border-gold/40 transition-all flex items-center gap-1"
+              >
+                <ShoppingBag className="w-3 h-3" />
+                أضف للسلة
+              </button>
+              <button 
+                onClick={(e) => {
                   e.stopPropagation();
                   hapticFeedback('heavy');
-                  try {
-                    const resp = await fetch('/api/payments/create', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ templateId: template.id, amount: template.price })
-                    });
-                    const data = await resp.json();
-                    
-                    if (data.invoice_url && data.invoice_url !== "#") {
-                      window.open(data.invoice_url, '_blank');
-                    } else if (data.id) {
-                      // Demo Flow -> Auto Confirm
-                      document.dispatchEvent(new CustomEvent('changeSection', { detail: 'orderConf' }));
-                    }
-                  } catch (err) {}
+                  const link = PAYMENT_LINKS.template_basic;
+                  window.open(link, '_blank');
                 }}
-                className="bg-gold text-cosmic px-8 py-2 rounded-full text-xs font-black uppercase tracking-tighter shadow-lg shadow-gold/20 hover:scale-105 transition-transform"
+                className="bg-gold text-cosmic px-6 py-2 rounded-full text-xs font-black uppercase tracking-tighter shadow-lg shadow-gold/20 hover:scale-105 transition-transform"
               >
-                شراء الآن
+                شراء سريع
               </button>
             </div>
           </div>
@@ -141,9 +142,15 @@ const TemplateCard = React.memo(({ template, onPreview }: TemplateCardProps) => 
             {template.title}
           </h3>
           
-          <p className="text-pearl/50 text-sm leading-relaxed mb-8 line-clamp-2 font-sans font-light">
+          <p className="text-pearl/50 text-sm leading-relaxed mb-6 line-clamp-2 font-sans font-light">
             {template.description}
           </p>
+
+          <div className="mb-6 flex items-center">
+            <span className="text-2xl font-black text-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]">
+              {formatCurrency(template.price)}
+            </span>
+          </div>
 
           <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5">
             <div className="flex items-center gap-3">

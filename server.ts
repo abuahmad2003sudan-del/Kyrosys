@@ -25,75 +25,59 @@ async function startServer() {
 
   // 1. Premium Payment Engine: NOWPayments Integration
   app.post("/api/payments/create", async (req, res) => {
-    const { amount, currency, templateId } = req.body;
+    const { price_amount, price_currency, order_id, templateId } = req.body;
     const apiKey = process.env.NOWPAYMENTS_API_KEY;
 
-    // In an Elite setup, we never fail, we adapt.
-    const orderId = "ORD-" + Math.random().toString(36).substring(2, 9).toUpperCase();
-    
     try {
-      if (apiKey && apiKey !== "your_api_key_here") {
-        const response = await fetch("https://api.nowpayments.io/v1/invoice", {
+      if (!apiKey || apiKey === "your_api_key_here") {
+        return res.status(500).json({ 
+          error: "بوابة الدفع غير مهيأة", 
+          details: "يجب عليك إضافة مفتاح NOWPAYMENTS_API_KEY في إعدادات البيئة (Secrets) لتمكين الدفع الحقيقي بالعملات الرقمية." 
+        });
+      }
+
+      const response = await fetch("https://api.nowpayments.io/v1/invoice", {
           method: "POST",
           headers: {
             "x-api-key": apiKey,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            price_amount: amount,
-            price_currency: currency || "usd",
-            order_id: orderId,
-            order_description: `Elite Asset Purchase: ${templateId}`,
+            price_amount: price_amount,
+            price_currency: price_currency || "usd",
+            order_id: order_id,
+            order_description: `Elite Asset Purchase: ${templateId || 'assets'}`,
             ipn_callback_url: `${req.protocol}://${req.get('host')}/api/payments/webhook`,
             success_url: `${req.protocol}://${req.get('host')}/success`,
             cancel_url: `${req.protocol}://${req.get('host')}/cancel`
           })
-        });
-
-        const data = await response.json();
-        if (data.id) {
-           const holdTime = 7 * 24 * 60 * 60 * 1000;
-           IMPERIAL_DB.escrowOrders.push({
-             id: data.id,
-             orderId: orderId,
-             templateId,
-             amount,
-             status: 'pending',
-             createdAt: Date.now(),
-             unlockAt: Date.now() + holdTime,
-             commission: 0.05
-           });
-           return res.json(data);
-        }
-      }
-
-      // Fallback/Demo Logic (Premium Adaptability)
-      const paymentResponse = {
-        id: "PAY-" + orderId,
-        pay_address: "0x_IMPERIAL_VAULT_ADDRESS",
-        amount: amount,
-        currency: currency || "USD",
-        status: "waiting",
-        order_id: orderId,
-        invoice_url: "#" 
-      };
-
-      const holdTime = 7 * 24 * 60 * 60 * 1000;
-      IMPERIAL_DB.escrowOrders.push({
-        id: paymentResponse.id,
-        orderId: orderId,
-        templateId,
-        amount,
-        status: 'pending',
-        createdAt: Date.now(),
-        unlockAt: Date.now() + holdTime,
-        commission: 0.05 
       });
 
-      console.log(`[PAYMENT] Escrow Entry (Demo) Created for Template: ${templateId}`);
-      res.json(paymentResponse);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        return res.status(500).json({ error: "خطأ في إنشاء الفاتورة", details: data.message || "حدث خطأ غير متوقع مع بوابة الدفع" });
+      }
+
+      if (data.invoice_url) {
+         const holdTime = 7 * 24 * 60 * 60 * 1000;
+         IMPERIAL_DB.escrowOrders.push({
+           id: data.id,
+           orderId: order_id,
+           templateId,
+           amount: price_amount,
+           status: 'pending',
+           createdAt: Date.now(),
+           unlockAt: Date.now() + holdTime,
+           commission: 0.05
+         });
+         return res.json({ invoice_url: data.invoice_url });
+      } else {
+         return res.status(500).json({ error: "فشل إنشاء الفاتورة", details: "بوابة الدفع لم تعد رابط الفاتورة" });
+      }
+
     } catch (error) {
-       res.status(500).json({ error: "Premium Payment Link Severed" });
+       res.status(500).json({ error: "انقطع الاتصال الأساسي ببوابة الدفع", details: (error as Error).message });
     }
   });
 
@@ -117,7 +101,7 @@ async function startServer() {
     const { payment_status, order_id, invoice_id } = req.body;
 
     if (payment_status === 'finished' || payment_status === 'confirmed') {
-       const order = IMPERIAL_DB.escrowOrders.find(o => o.id === (invoice_id || order_id));
+       const order = IMPERIAL_DB.escrowOrders.find(o => o.id === invoice_id || o.orderId === order_id);
        if (order) {
          order.status = 'confirmed';
          console.log(`[PAYMENT] Order ${order_id} confirmed by Webhook.`);

@@ -1,10 +1,11 @@
-import { Search, Shield, User, Menu, Hexagon, ShieldCheck, Globe, ChevronDown, Repeat } from 'lucide-react';
+import { Search, Shield, User, Menu, Hexagon, ShieldCheck, Globe, ChevronDown, Repeat, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, ChangeEvent } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { useCurrency } from '../hooks/useCurrency';
 import { cn, hapticFeedback } from '../lib/utils';
 import { soundscapes } from '../lib/soundscapes';
+import { useCart } from '../context/CartContext';
 
 export default function Navbar({ onSearch }: { onSearch: (query: string) => void }) {
   const [isConnected, setIsConnected] = useState(false);
@@ -13,6 +14,7 @@ export default function Navbar({ onSearch }: { onSearch: (query: string) => void
   const [showLangMenu, setShowLangMenu] = useState(false);
   const { language, setLanguage, t } = useLanguage();
   const { currency, toggleCurrency } = useCurrency();
+  const { items, setIsCartOpen } = useCart();
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -144,7 +146,21 @@ export default function Navbar({ onSearch }: { onSearch: (query: string) => void
                 </AnimatePresence>
               </div>
 
-              {/* Wallet Connect */}
+              {/* Cart Button */}
+              <button
+                onClick={() => {
+                  hapticFeedback('light');
+                  setIsCartOpen(true);
+                }}
+                className="relative p-2 rounded-full hover:bg-white/5 transition-colors"
+              >
+                <ShoppingBag className="w-5 h-5 text-pearl" />
+                {items.length > 0 && (
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-gold rounded-full text-[10px] font-black text-cosmic flex items-center justify-center translate-x-1 -translate-y-1">
+                    {items.length}
+                  </span>
+                )}
+              </button>
               <button 
                 onClick={connectWallet}
                 disabled={isConnecting}

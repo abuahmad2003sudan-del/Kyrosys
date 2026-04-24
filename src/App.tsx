@@ -16,6 +16,7 @@ import SarcasticGateway from './components/SarcasticGateway';
 import OmniscienceDial from './components/OmniscienceDial';
 import GoldDust from './components/GoldDust';
 import { AuthModal } from './components/AuthModal';
+import { CartSlideout } from './components/CartSlideout';
 import { useAuth } from './context/AuthContext';
 import { AboutPage, ContactPage, PricingPage, LegalPage, OrderConfirmationPage } from './pages/ImperialPages';
 import { TreasuryPage } from './pages/TreasuryPage';
@@ -153,6 +154,7 @@ export default function App() {
 
           <PreviewModal template={previewTemplate} onClose={() => setPreviewTemplate(null)} />
           {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+          <CartSlideout />
           <GoldDust trigger={dustTrigger} />
           <OmniscienceDial />
           <CosmicBackground />

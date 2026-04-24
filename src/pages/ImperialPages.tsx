@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Shield, Mail, Phone, Zap, ArrowRight, Lock, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { PAYMENT_LINKS } from '../config/paymentLinks';
 
 export const AboutPage = () => (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto px-6 py-24 pb-48 text-center" dir="rtl">
@@ -82,24 +83,14 @@ export const PricingPage = () => (
               </li>
             ))}
           </ul>
-          <button onClick={async () => {
+          <button onClick={() => {
               if(plan.price === 'مجاناً') {
                   document.dispatchEvent(new CustomEvent('changeSection', { detail: 'dashboard' }));
                   return;
               }
-              try {
-                  const resp = await fetch('/api/payments/create', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ templateId: `plan_${plan.name}`, amount: plan.price.replace(/[^0-9]/g, '') })
-                  });
-                  const data = await resp.json();
-                  if (data.invoice_url && data.invoice_url !== "#") {
-                      window.open(data.invoice_url, '_blank');
-                  } else if (data.id) {
-                      document.dispatchEvent(new CustomEvent('changeSection', { detail: 'orderConf' }));
-                  }
-              } catch(e) {}
+              const link = plan.name.includes('الاحترافي') ? PAYMENT_LINKS.subscription_monthly : 
+                           plan.name.includes('الفضائي') ? PAYMENT_LINKS.subscription_yearly : PAYMENT_LINKS.template_basic;
+              window.open(link, '_blank');
           }} className={`w-full py-4 rounded-xl font-black transition-colors ${plan.popular ? 'bg-cosmic text-gold hover:bg-white' : 'bg-white/10 text-pearl hover:bg-gold hover:text-cosmic'}`}>
             تفعيل الخطة
           </button>
