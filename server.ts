@@ -48,8 +48,8 @@ async function startServer() {
             order_id: order_id,
             order_description: `Elite Asset Purchase: ${templateId || 'assets'}`,
             ipn_callback_url: `${req.protocol}://${req.get('host')}/api/payments/webhook`,
-            success_url: `${req.protocol}://${req.get('host')}/success`,
-            cancel_url: `${req.protocol}://${req.get('host')}/cancel`
+            success_url: `${req.protocol}://${req.get('host')}/?section=order-confirmation&orderId=${order_id}`,
+            cancel_url: `${req.protocol}://${req.get('host')}/`
           })
       });
 
@@ -103,12 +103,20 @@ async function startServer() {
     if (payment_status === 'finished' || payment_status === 'confirmed') {
        const order = IMPERIAL_DB.escrowOrders.find(o => o.id === invoice_id || o.orderId === order_id);
        if (order) {
-         order.status = 'confirmed';
+         order.status = 'paid';
          console.log(`[PAYMENT] Order ${order_id} confirmed by Webhook.`);
        }
     }
 
     res.sendStatus(200);
+  });
+
+  app.get("/api/orders/:orderId/status", (req, res) => {
+    const order = IMPERIAL_DB.escrowOrders.find(o => o.orderId === req.params.orderId);
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.json({ status: order.status, templateId: order.templateId });
   });
 
   // 2. Autonomous Generation Engine (Pulse Cron)

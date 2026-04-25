@@ -21,6 +21,10 @@ export interface Template {
   generationCycle?: number;
   demoUrl?: string;
   downloadUrl?: string;
+  valueProposition?: string;
+  aiFeatures?: string[];
+  isNiche?: boolean;
+  originalPrice?: number;
 }
 
 export interface MarketPulse {

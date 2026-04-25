@@ -39,29 +39,28 @@ export default function PreviewModal({ template, onClose }: PreviewModalProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           templateId: template.id, 
-          amount: template.price,
-          currency: 'USD'
+          price_amount: template.price,
+          price_currency: 'usd',
+          order_id: "ORD-" + Math.random().toString(36).substring(2, 9).toUpperCase()
         })
       });
       const data = await resp.json();
       
-      if (data.id) {
-        // Success protocol simulated
-        setTimeout(() => {
-          setIsPurchasing(false);
-          hapticFeedback('success');
-          soundscapes.playChime();
-          setDustOrigin({ x, y });
-          setGoldDustTrigger(prev => prev + 1);
-          
-          alert(`[Elite Guard] استبسال في الطلب الحصري: ${data.order_id}\nتم تحويل الأصول إلى غرفة الانتظار (Escrow).`);
-          
-          setTimeout(() => onClose(), 2000);
-        }, 2000);
+      if (!resp.ok) {
+        alert(`${data.error}\n${data.details}`);
+        setIsPurchasing(false);
+        return;
       }
-    } catch (err) {
+      
+      if (data.invoice_url) {
+        window.location.href = data.invoice_url;
+      } else {
+         alert('حدث خطأ في توجيه الدفع.');
+         setIsPurchasing(false);
+      }
+    } catch(err) {
+      alert("حدث خطأ في الاتصال بالخادم.");
       setIsPurchasing(false);
-      hapticFeedback('error');
     }
   };
 
@@ -155,13 +154,22 @@ export default function PreviewModal({ template, onClose }: PreviewModalProps) {
               "flex-1 relative bg-black/60 group transition-all duration-700",
               showFullIframe ? "w-full overflow-hidden" : "w-full lg:w-[65%]"
             )}>
-              {/* Iframe for real browsing */}
-              <iframe 
-                src={template.demoUrl || template.thumbnail} 
-                className="w-full h-full border-none opacity-90 group-hover:opacity-100 transition-opacity"
-                title={`Elite Preview: ${template.title}`}
-                loading="lazy"
-              />
+              {(!template.demoUrl || template.demoUrl === '#') ? (
+                <img 
+                  src={template.image || template.thumbnail} 
+                  alt={template.title}
+                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <iframe 
+                  src={template.demoUrl} 
+                  className="w-full h-full border-none opacity-90 group-hover:opacity-100 transition-opacity"
+                  title={`Elite Preview: ${template.title}`}
+                  loading="lazy"
+                />
+              )}
               
               {/* Elite Color Transformation Overlay */}
               <div className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-30 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.15)_0%,transparent_100%)]" />
@@ -255,7 +263,7 @@ export default function PreviewModal({ template, onClose }: PreviewModalProps) {
                         ) : (
                           <div className="flex items-center justify-center gap-3">
                             <ShoppingCart className="w-5 h-5" />
-                            <span>امتلاك هذا الأصل الحصري</span>
+                            <span>اشتري الآن</span>
                           </div>
                         )}
                       </button>

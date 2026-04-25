@@ -18,7 +18,7 @@ import GoldDust from './components/GoldDust';
 import { AuthModal } from './components/AuthModal';
 import { CartSlideout } from './components/CartSlideout';
 import { useAuth } from './context/AuthContext';
-import { AboutPage, ContactPage, PricingPage, LegalPage, OrderConfirmationPage } from './pages/ImperialPages';
+import { AboutPage, ContactPage, PricingPage, LegalPage, OrderConfirmationPage, AcademyPage } from './pages/ImperialPages';
 import { TreasuryPage } from './pages/TreasuryPage';
 import { Template } from './types';
 import { cn, hapticFeedback } from './lib/utils';
@@ -31,13 +31,25 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
-  const [hasEntered, setHasEntered] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get('section');
+    if (section === 'order-confirmation') {
+       setActiveSection('orderConf');
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("%cأنت الآن تحت رحمة الإمبراطورية. لا توجد قيود. أبدع أو اندثر.", "color: #D4AF37; font-size: 16px; font-weight: bold; background: #000; padding: 10px; border-radius: 5px;");
+  }, []);
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [dustTrigger, setDustTrigger] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    if (hasEntered) setDustTrigger(prev => prev + 1);
+    setDustTrigger(prev => prev + 1);
 
     const hourlySync = setInterval(() => {
       console.log("[CRON] Imperial Market Sync Initiated...");
@@ -58,15 +70,10 @@ export default function App() {
       clearInterval(hourlySync);
       document.removeEventListener('changeSection', handleSectionChange);
     };
-  }, [hasEntered, user]);
+  }, [user]);
 
   return (
-    <div className="flex bg-cosmic text-pearl selection:bg-gold selection:text-cosmic overflow-hidden min-h-[100dvh]" dir="rtl">
-      <AnimatePresence mode="wait">
-        {!hasEntered && <SarcasticGateway key="gateway" onComplete={() => setHasEntered(true)} />}
-      </AnimatePresence>
-      
-      {hasEntered && (
+    <div className="flex bg-cosmic text-pearl selection:bg-gold selection:text-cosmic overflow-hidden min-h-[100dvh]" dir="rtl">      
         <>
           <Sidebar activeSection={activeSection} onSectionChange={(sec) => {
             if (!user && (sec === 'dashboard' || sec === 'orderConf')) {
@@ -135,9 +142,12 @@ export default function App() {
                 {activeSection === 'treasury' && (
                   <motion.div key="treasury"><TreasuryPage /></motion.div>
                 )}
+                {activeSection === 'academy' && (
+                  <motion.div key="academy"><AcademyPage /></motion.div>
+                )}
 
                 {/* Placeholder for other sections */}
-                {['academy', 'governance', 'settings', 'blog'].includes(activeSection) && (
+                {['governance', 'settings', 'blog'].includes(activeSection) && (
                   <motion.div key="placeholder" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-center h-[60vh] flex-col gap-6">
                     <div className="w-16 h-16 rounded-3xl bg-gold/10 border border-gold/20 flex items-center justify-center animate-pulse">
                        <div className="w-4 h-4 bg-gold rounded-full" />
@@ -160,7 +170,6 @@ export default function App() {
           <CosmicBackground />
           <StarfieldBackground />
         </>
-      )}
 
       {/* Global Background Glows */}
       <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-gold/5 blur-[150px] -z-10 rounded-full" />

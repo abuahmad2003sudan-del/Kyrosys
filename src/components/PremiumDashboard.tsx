@@ -228,6 +228,40 @@ export default function PremiumDashboard() {
            <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-500/50" />
         </div>
       </div>
+
+      {/* Designed for Professionals Section */}
+      <div className="mt-16 pt-16 border-t border-gold/10">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+          <div>
+            <h2 className="text-3xl font-serif font-black text-pearl flex items-center gap-3">
+              <Shield className="w-6 h-6 text-gold" />
+              مصمم للمحترفين ووكالات التسويق
+            </h2>
+            <p className="text-pearl/50 mt-2 font-light">مجموعة أصول مخصصة تضمن أداءً لا يقبل المساومة في العيادات والوكالات المرموقة.</p>
+          </div>
+          <button 
+            onClick={() => document.dispatchEvent(new CustomEvent('changeSection', { detail: 'vault' }))}
+            className="flex items-center gap-2 text-gold hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+          >
+            تصفح القائمة الكاملة <ArrowUpRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+           {['medical', 'realestate', 'agency'].map((niche, i) => (
+             <div key={i} className="p-8 rounded-[2.5rem] bg-white/5 border border-white/10 hover:border-gold/30 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] transition-all cursor-pointer group">
+               <div className="flex justify-between items-start mb-6">
+                 <span className="bg-gold/20 text-gold px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-gold/40">
+                   مفضل لدى وكالات التسويق
+                 </span>
+                 <Lock className="w-4 h-4 text-pearl/40 group-hover:text-gold transition-colors" />
+               </div>
+               <h3 className="text-2xl font-black text-pearl mb-2">قالب {niche === 'medical' ? 'طبي' : niche === 'realestate' ? 'عقاري' : 'وكالة تخطيط'} متقدم</h3>
+               <p className="text-pearl/50 text-sm font-light mb-6">حلول جاهزة بتقنية AI لرفع معدلات التحويل وتوفير أيام من وقت التطوير.</p>
+               <button onClick={() => document.dispatchEvent(new CustomEvent('changeSection', { detail: 'vault' }))} className="w-full py-3 rounded-full bg-black/40 text-pearl/80 border border-white/10 font-bold text-xs uppercase hover:bg-gold/10 hover:text-gold transition-all">استكشف الأصل</button>
+             </div>
+           ))}
+        </div>
+      </div>
     </motion.div>
   );
 }

@@ -1,6 +1,3 @@
 User-agent: *
-Disallow: /api/
-Disallow: /admin/
 Allow: /
-
 Sitemap: https://kyrosys.ais.run/sitemap.xml

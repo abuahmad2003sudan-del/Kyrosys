@@ -15,12 +15,38 @@ export function CartSlideout() {
 
   const handleCheckout = async () => {
     hapticFeedback('heavy');
-    if (!user) {
-      document.dispatchEvent(new CustomEvent('changeSection', { detail: 'orderConf' })); // Will trigger auth
-      return;
+    setLoading(true);
+
+    try {
+      const resp = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          templateId: items.map(i => i.id).join(','), 
+          price_amount: total,
+          price_currency: 'usd',
+          order_id: "ORD-" + Math.random().toString(36).substring(2, 9).toUpperCase()
+        })
+      });
+      const data = await resp.json();
+      
+      if (!resp.ok) {
+        alert(`${data.error}\n${data.details}`);
+        return;
+      }
+      
+      if (data.invoice_url) {
+        window.location.href = data.invoice_url;
+        clearCart();
+        setIsCartOpen(false);
+      } else {
+         alert('حدث خطأ في توجيه الدفع.');
+      }
+    } catch(err) {
+      alert("حدث خطأ في الاتصال بالخادم.");
+    } finally {
+      setLoading(false);
     }
-    
-    window.open(PAYMENT_LINKS.checkout_cart || PAYMENT_LINKS.template_basic, '_blank');
   };
 
   return (
@@ -70,7 +96,7 @@ export function CartSlideout() {
                     key={item.id} 
                     className="flex gap-4 bg-white/5 border border-white/10 rounded-2xl p-3"
                   >
-                    <img src={item.thumbnail} alt={item.title} className="w-24 h-20 object-cover rounded-xl" />
+                    <img src={item.thumbnail} alt={item.title} className="w-24 h-20 object-cover rounded-xl" loading="lazy" decoding="async" />
                     <div className="flex-1 flex flex-col justify-between">
                       <h3 className="font-bold text-pearl text-sm line-clamp-1">{item.title}</h3>
                       <div className="flex items-center justify-between">
@@ -91,7 +117,10 @@ export function CartSlideout() {
             {items.length > 0 && (
               <div className="p-6 border-t border-white/10 bg-black/40 backdrop-blur-xl">
                 <div className="flex justify-between items-center mb-6">
-                  <span className="text-pearl/70 font-medium text-lg">الإجمالي</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-pearl/70 font-medium text-lg">الإجمالي</span>
+                    <button onClick={clearCart} className="text-xs text-red-400 hover:text-red-300 transition-colors text-right">إفراغ السلة</button>
+                  </div>
                   <span className="text-3xl font-black text-gold gold-glow">{formatCurrency(total)}</span>
                 </div>
                 <button

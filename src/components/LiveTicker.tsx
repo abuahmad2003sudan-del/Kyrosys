@@ -36,8 +36,16 @@ export default function LiveTicker() {
           </div>
 
           <div className="flex items-center gap-2 text-pearl/60">
+            <span className="text-blue-400">🚀 أكثر من 500 قالب تم تحميلها هذا الشهر</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-pearl/60">
             <Zap className="w-3 h-3" />
             <span>QUANTUM_ENTROPY: <span className="text-indigo-300">{entropy}</span></span>
+          </div>
+
+          <div className="flex items-center gap-2 text-pearl/60">
+            <span className="text-gold">⭐ متوسط تقييم 4.9 من 5 نجوم للعملاء النشطين</span>
           </div>
 
           <div className="flex items-center gap-2 text-pearl/60">
@@ -62,8 +70,16 @@ export default function LiveTicker() {
           </div>
 
           <div className="flex items-center gap-2 text-pearl/60">
+            <span className="text-blue-400">🚀 أكثر من 500 قالب تم تحميلها هذا الشهر</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-pearl/60">
             <Zap className="w-3 h-3" />
             <span>QUANTUM_ENTROPY: <span className="text-indigo-300">{entropy}</span></span>
+          </div>
+
+          <div className="flex items-center gap-2 text-pearl/60">
+            <span className="text-gold">⭐ متوسط تقييم 4.9 من 5 نجوم للعملاء النشطين</span>
           </div>
 
           <div className="flex items-center gap-2 text-pearl/60">
