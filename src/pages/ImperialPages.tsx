@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Shield, Mail, Phone, Zap, ArrowRight, Lock, CheckCircle2, BookOpen, PenTool, Lightbulb } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { confetti } from '../lib/confetti';
 import { PAYMENT_LINKS } from '../config/paymentLinks';
 
 export const AcademyPage = () => (

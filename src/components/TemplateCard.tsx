@@ -125,7 +125,7 @@ const TemplateCard = React.memo(({ template, onPreview }: TemplateCardProps) => 
                متخصص
              </span>
             )}
-            {template.aiFeatures && template.aiFeatures.length > 0 && (
+            {template.aiFeatures && (Array.isArray(template.aiFeatures) && template.aiFeatures.length > 0) && (
              <span className="bg-blue-500/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-blue-300 border border-blue-500/40 uppercase tracking-tighter shadow-lg">
                مدعوم بـ AI
              </span>

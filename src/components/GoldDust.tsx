@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import confetti from 'canvas-confetti';
+import { confetti } from '../lib/confetti';
 
 interface GoldDustProps {
   trigger: number; // Increment this to trigger the effect

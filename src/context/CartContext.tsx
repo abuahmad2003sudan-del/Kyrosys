@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { Template } from '../types';
-import confetti from 'canvas-confetti';
+import { confetti } from '../lib/confetti';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface CartContextType {
